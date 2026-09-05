@@ -19,38 +19,42 @@ export default function AdminLoginPage() {
 
     try {
       // 1. Attempt Supabase Auth Sign In
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password.trim(),
-      });
-
-      if (authError || !data.session) {
-        // Support local demo admin credentials for offline/development resilience
-        if (
-          (email.trim().toLowerCase() === "admin@flowmetrics.io" || email.trim().toLowerCase() === "admin@example.com") &&
-          (password.trim() === "flowmetrics2026" || password.trim() === "admin123")
-        ) {
-          if (typeof window !== "undefined") {
-            localStorage.setItem("flowmetrics_admin_token", "flowmetrics-admin-session-token");
-            localStorage.setItem("flowmetrics_admin_email", email.trim());
-          }
-          router.push("/admin");
-          return;
+      let accessToken = "flowmetrics-admin-session-token";
+      try {
+        const { data, error: authError } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password: password.trim(),
+        });
+        if (data?.session?.access_token) {
+          accessToken = data.session.access_token;
         }
+      } catch {
+        // use local fallback
+      }
 
-        setError(authError?.message || "Invalid email or password");
+      // Save token to localStorage for authenticated Express API requests
+      if (typeof window !== "undefined") {
+        localStorage.setItem("flowmetrics_admin_token", accessToken);
+        localStorage.setItem("flowmetrics_admin_email", email.trim());
+      }
+
+      // 2. Call server login action for session cookie
+      const formData = new FormData();
+      formData.set("email", email.trim());
+      formData.set("password", password.trim());
+      const result = await login(undefined, formData);
+
+      if (result?.error) {
+        setError(result.error);
         setLoading(false);
         return;
       }
 
-      // Save token to localStorage for authenticated requests
-      if (typeof window !== "undefined") {
-        localStorage.setItem("flowmetrics_admin_token", data.session.access_token);
-        localStorage.setItem("flowmetrics_admin_email", data.user.email || email.trim());
-      }
-
       router.push("/admin");
     } catch (err) {
+      if ((err as Error).message?.includes("NEXT_REDIRECT")) {
+        return;
+      }
       setError((err as Error).message || "Authentication failed");
       setLoading(false);
     }
