@@ -1,5 +1,9 @@
 # Flowmetrics — SaaS Full Stack Platform
 
+deployed link - https://flowmetrics-xf93.onrender.com
+Email: admin@flowmetrics.io
+Password: flowmetrics2026
+
 Flowmetrics is a modern SaaS platform designed for engineering managers and agency owners to monitor team workload, sprint capacity, project health, and operational visibility.
 
 This project was built as a comprehensive Full Stack hiring challenge demonstrating a decoupled **Next.js frontend**, **Express.js TypeScript backend**, **PostgreSQL database (without ORM)**, **Supabase Authentication**, **Role-based Access Control**, **Zod Validation**, and **Rate Limiting**.
@@ -157,28 +161,6 @@ In your Supabase dashboard:
 
 ---
 
-## ⚙️ Environment Variables
-
-### Frontend (`.env`)
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-NEXT_PUBLIC_API_URL=http://localhost:5000
-```
-
-### Backend (`backend/.env`)
-```env
-PORT=5000
-POSTGRES_SERVER=localhost
-POSTGRES_PORT=5432
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=flowmetrics
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/flowmetrics?sslmode=disable
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-supabase-anon-key
-CLIENT_URL=http://localhost:3000
-```
 
 ---
 
@@ -243,9 +225,4 @@ Frontend runs on: `http://localhost:3000`
 
 ---
 
-## 🎙️ Round 2 Technical Interview Talking Points
 
-1. **Why No Prisma?**: The challenge explicitly required direct SQL with `node-postgres` (`pg`), demonstrating direct query composition, indexing, connection pooling, and parameterized query security without ORM overhead.
-2. **Security & Authorization Boundary**: Security is strictly enforced on the Express backend middleware rather than trusting client-side claims. Even if a client modifies the frontend, the backend validates the Supabase JWT and checks the admin role metadata before executing queries.
-3. **Draft Privacy**: Public API endpoints execute `WHERE published = true` at the database level so draft articles are never leaked over the wire.
-4. **Resilience**: The backend incorporates robust error handling, database pool configuration, and type-safe Zod validation ensuring clean 400, 401, 403, 404, 429, and 500 responses.
