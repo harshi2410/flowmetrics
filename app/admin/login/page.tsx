@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { login } from "@/lib/auth";
 import { Button } from "@/components/ui/Button";
 
 export default function AdminLoginPage() {
