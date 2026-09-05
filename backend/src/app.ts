@@ -54,10 +54,6 @@ app.use("/api/pricing", pricingRouter);
 app.use("/api/blog", blogRouter);
 app.use("/api/admin", adminRouter);
 
-// 404 handler for unmatched API routes
-app.use((_req, res) => {
-  res.status(404).json({ error: "Not Found", message: "API route does not exist" });
-});
-
-// Centralized Error Handling Middleware
+// Centralized Error Handling Middleware for API routes
 app.use(errorHandler);
+

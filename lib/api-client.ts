@@ -1,7 +1,17 @@
 import { supabase } from "./supabase/client";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+export function getApiBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
+  }
+  if (typeof window !== "undefined") {
+    return "";
+  }
+  const port = process.env.PORT || 5000;
+  return `http://127.0.0.1:${port}`;
+}
+
+const API_BASE_URL = getApiBaseUrl();
 
 export interface ApiError extends Error {
   status?: number;

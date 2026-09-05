@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { blogPosts as defaultBlogPosts, type BlogPost } from "@/lib/data";
 
+import { getApiBaseUrl } from "@/lib/api-client";
+
 async function fetchBlogPosts(): Promise<BlogPost[]> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const apiUrl = getApiBaseUrl();
   try {
     const res = await fetch(`${apiUrl}/api/blog`, {
       cache: "no-store",

@@ -4,8 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "build:backend": "npm --prefix backend run build",
+    "build:frontend": "next build",
+    "build": "npm run build:backend && next build",
+    "build:render": "npm install --include=dev && npm --prefix backend install --include=dev && npm run build",
+    "start": "node backend/dist/server.js",
+    "start:next": "next start",
     "lint": "eslint",
     "db:init": "tsx scripts/init-db.ts",
     "db:seed": "tsx scripts/init-db.ts"

@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/Button";
 import { pricingPlans as defaultPlans, type PricingPlan } from "@/lib/data";
 
+import { getApiBaseUrl } from "@/lib/api-client";
+
 async function fetchPricing(): Promise<PricingPlan[]> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const apiUrl = getApiBaseUrl();
   try {
     const res = await fetch(`${apiUrl}/api/pricing`, {
       cache: "no-store",

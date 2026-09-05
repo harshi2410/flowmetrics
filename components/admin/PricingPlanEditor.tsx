@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import type { PricingPlan } from "@/lib/data";
 import { updatePricingPlanAction } from "@/lib/admin-actions";
+import { getApiBaseUrl } from "@/lib/api-client";
 import { Button } from "@/components/ui/Button";
 
 export function PricingPlanEditor({ plan }: { plan: PricingPlan }) {
@@ -40,7 +41,7 @@ export function PricingPlanEditor({ plan }: { plan: PricingPlan }) {
     const form = e.currentTarget;
     const formData = new FormData(form);
     const filteredFeatures = features.map((f) => f.trim()).filter(Boolean);
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const apiUrl = getApiBaseUrl();
 
     const payload = {
       name: (formData.get("name") as string) || plan.name,
