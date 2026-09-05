@@ -2,17 +2,18 @@ import { app } from "./app.js";
 import { initializeDatabase } from "./db/init.js";
 import dotenv from "dotenv";
 import next from "next";
+import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 dotenv.config();
 
 const PORT = Number(process.env.PORT) || 5000;
 const dev = process.env.NODE_ENV !== "production";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const rootDir = path.resolve(__dirname, "../../");
+// Determine repository root directory (where .next and package.json reside)
+const rootDir = fs.existsSync(path.resolve(process.cwd(), ".next")) || fs.existsSync(path.resolve(process.cwd(), "app"))
+  ? process.cwd()
+  : path.resolve(process.cwd(), "..");
 
 const nextApp = (next as unknown as { default?: typeof next })?.default
   ? (next as unknown as { default: typeof next }).default({ dev, dir: rootDir })

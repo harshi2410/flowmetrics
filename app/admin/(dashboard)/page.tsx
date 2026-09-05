@@ -1,7 +1,9 @@
+import { getApiBaseUrl } from "@/lib/api-client";
+
 export const dynamic = "force-dynamic";
 
 async function fetchStats() {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const apiUrl = getApiBaseUrl();
   try {
     const res = await fetch(`${apiUrl}/api/admin/stats`, {
       cache: "no-store",

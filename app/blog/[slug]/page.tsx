@@ -3,9 +3,10 @@ import { notFound } from "next/navigation";
 import { blogPosts as defaultBlogPosts, type BlogPost } from "@/lib/data";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
+import { getApiBaseUrl } from "@/lib/api-client";
 
 async function fetchBlogPost(slug: string): Promise<BlogPost | null> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const apiUrl = getApiBaseUrl();
   try {
     const res = await fetch(`${apiUrl}/api/blog/${slug}`, {
       cache: "no-store",

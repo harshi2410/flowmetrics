@@ -1,24 +1,28 @@
 services:
   - type: web
-    name: flowmetrics-backend
+    name: flowmetrics
     runtime: node
     plan: free
-    rootDir: backend
-    buildCommand: npm install && npm run build
+    buildCommand: npm run build:render
     startCommand: npm run start
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
-      - key: DATABASE_URL
-        sync: false
       - key: DATABASE_SSL
         value: "true"
+      - key: CLIENT_URL
+        value: https://flowmetrics.onrender.com
+      - key: NEXT_PUBLIC_API_URL
+        value: https://flowmetrics.onrender.com
+      - key: DATABASE_URL
+        sync: false
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_ANON_KEY
         sync: false
-      - key: CLIENT_URL
+      - key: NEXT_PUBLIC_SUPABASE_URL
         sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+

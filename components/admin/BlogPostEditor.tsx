@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import type { BlogPost } from "@/lib/data";
 import { saveBlogPostAction, deleteBlogPostAction } from "@/lib/admin-actions";
+import { getApiBaseUrl } from "@/lib/api-client";
 import { Button } from "@/components/ui/Button";
 
 export function BlogPostEditor({ initialPosts }: { initialPosts: BlogPost[] }) {
@@ -63,7 +64,7 @@ export function BlogPostEditor({ initialPosts }: { initialPosts: BlogPost[] }) {
     setSaving(true);
     setStatusMessage(null);
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const apiUrl = getApiBaseUrl();
     const generatedSlug =
       slug.trim() ||
       (editingPost ? editingPost.slug : title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
@@ -148,7 +149,7 @@ export function BlogPostEditor({ initialPosts }: { initialPosts: BlogPost[] }) {
     }
     setDeletingSlug(postSlug);
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const apiUrl = getApiBaseUrl();
     try {
       const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_admin_token") || "flowmetrics-admin-session-token" : "";
       await fetch(`${apiUrl}/api/admin/blog/${postSlug}`, {
