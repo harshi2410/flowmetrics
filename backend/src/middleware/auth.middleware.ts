@@ -18,7 +18,8 @@ export async function authMiddleware(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const authHeader = req.headers.authorization;
+  const rawHeader = req.headers.authorization || (req.headers as Record<string, string | string[] | undefined>)["authorization"];
+  const authHeader = Array.isArray(rawHeader) ? rawHeader[0] : rawHeader;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     res.status(401).json({
