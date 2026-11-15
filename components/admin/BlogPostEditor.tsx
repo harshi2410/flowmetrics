@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import type { BlogPost } from "@/lib/data";
 import { saveBlogPostAction, deleteBlogPostAction } from "@/lib/admin-actions";
 import { getApiBaseUrl } from "@/lib/api-client";
@@ -15,6 +16,32 @@ export function BlogPostEditor({ initialPosts }: { initialPosts: BlogPost[] }) {
 
   useEffect(() => {
     setPosts(initialPosts);
+
+    // Check if user redirected from AI Content Studio with generated content
+    try {
+      const draftStr = sessionStorage.getItem("flowmetrics_ai_blog_draft");
+      if (draftStr) {
+        const draft = JSON.parse(draftStr);
+        if (draft.title) {
+          setTitle(draft.title);
+          setSlug(
+            draft.title
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, "-")
+              .replace(/(^-|-$)/g, "")
+          );
+        }
+        if (draft.excerpt) setExcerpt(draft.excerpt);
+        if (draft.content) setContent(draft.content);
+        setStatusMessage({
+          text: "✨ Draft successfully imported from AI Content Studio! Review and publish below.",
+          type: "success",
+        });
+        sessionStorage.removeItem("flowmetrics_ai_blog_draft");
+      }
+    } catch {
+      // ignore
+    }
   }, [initialPosts]);
 
   // Form state
@@ -246,19 +273,28 @@ export function BlogPostEditor({ initialPosts }: { initialPosts: BlogPost[] }) {
         onSubmit={handleSubmit}
         className="flex h-fit flex-col gap-4 rounded-xl border border-line bg-surface p-5 sm:p-6"
       >
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-display text-lg font-semibold text-text">
             {editingPost ? "Edit Post" : "Create New Post"}
           </h2>
-          {editingPost && (
-            <button
-              type="button"
-              onClick={resetForm}
-              className="text-xs text-muted hover:text-signal transition-colors"
+          <div className="flex items-center gap-2">
+            <Link
+              href="/admin/generator"
+              className="flex items-center gap-1.5 rounded-md border border-signal/40 bg-signal/10 px-2.5 py-1 text-xs font-medium text-signal hover:bg-signal/20 transition-colors"
             >
-              + Switch to New Post
-            </button>
-          )}
+              <span>✨</span>
+              <span>Generate with AI</span>
+            </Link>
+            {editingPost && (
+              <button
+                type="button"
+                onClick={resetForm}
+                className="text-xs text-muted hover:text-signal transition-colors"
+              >
+                + Switch to New Post
+              </button>
+            )}
+          </div>
         </div>
 
         <div>

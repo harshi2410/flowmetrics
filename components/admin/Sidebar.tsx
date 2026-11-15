@@ -9,6 +9,7 @@ const links = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/pricing", label: "Pricing" },
   { href: "/admin/blog", label: "Blog" },
+  { href: "/admin/generator", label: "AI Writer ✨" },
 ];
 
 export function Sidebar() {

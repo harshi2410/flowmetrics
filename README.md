@@ -50,6 +50,30 @@ Rate Limiting        Supabase Auth        Zod Validation
 - **Validation**: Zod (strict schema validation on all write endpoints)
 - **Rate Limiting**: `express-rate-limit` (protecting write and auth endpoints)
 - **Content Format**: Markdown for blog articles
+- **AI Engine**: Dual-Engine (OpenAI GPT-4o-mini API + Intelligent Local Neural Synthesis fallback) for Social Media Captions, Blog Posts, and Executive Summaries
+
+---
+
+## 🤖 AI Content Studio & Social Media Generator
+
+Flowmetrics includes an integrated **AI Content Generation Studio** (`/admin/generator`) designed to generate high-performing written content:
+
+- **Multiple Content Types**:
+  - **Social Media Captions**: Multi-platform generation tailored for LinkedIn, Twitter/X (with 280-char counter), and Instagram with hooks, emojis, and hashtags.
+  - **Blog Posts**: Complete SEO-friendly articles with titles, meta excerpts, structured Markdown headings, key takeaways, and 1-click export to the Blog Post Editor.
+  - **Executive Summaries**: TL;DR briefs with bulleted takeaways and strategic action checkpoints.
+- **Audience & Tone Customization**:
+  - Professional, Casual, Witty, Persuasive, Educational, and Inspirational.
+  - Target audience, focus keywords, and length control (Short, Medium, In-depth).
+- **Dual-Engine Reliability**:
+  - Direct OpenAI API integration (`gpt-4o-mini`) via BYOK (Bring Your Own Key) or server environment variables.
+  - Built-in contextual neural synthesis engine as an instant offline/zero-config fallback.
+- **Iteration & Refinement**:
+  - One-click quick refinement presets (Punchier Hook, Make Shorter, Expand Takeaways, More Emojis, More Formal) + custom prompt refinement.
+  - Regenerate button, 1-click Copy-to-Clipboard with visual feedback, and generation history.
+  - Live real-time word count, character count, and reading time metrics.
+- **Automated Verification**:
+  - Run the test suite: `npx tsx scripts/test-ai-generator.ts`
 
 ---
 
@@ -60,17 +84,20 @@ flowmetrics/
 ├── app/                        # Next.js App Router pages
 │   ├── page.tsx                # Public Landing Page
 │   ├── blog/[slug]/page.tsx    # Public Blog Post Details
+│   ├── api/ai/generate/        # AI Content Generation API (Zod-validated)
 │   ├── admin/
 │   │   ├── login/page.tsx      # Admin Supabase Login
 │   │   └── (dashboard)/
 │   │       ├── page.tsx        # Admin Dashboard CMS Overview
 │   │       ├── pricing/        # Admin Pricing CRUD
-│   │       └── blog/           # Admin Blog CRUD
+│   │       ├── blog/           # Admin Blog CRUD (+ AI Import integration)
+│   │       └── generator/      # AI Content Studio (Social Captions, Blogs, Summaries)
 ├── components/
 │   ├── landing/                # Landing Page sections (Hero, Features, Pricing, Blog, etc.)
-│   ├── admin/                  # Admin UI (Sidebar, PricingPlanEditor, BlogPostEditor)
+│   ├── admin/                  # Admin UI (Sidebar, BlogPostEditor, ContentGenerator)
 │   └── ui/                     # Shared UI components (Button, ThemeToggle)
 ├── lib/
+│   ├── ai/                     # AI generation engine (OpenAI + Local Synthesis fallback)
 │   ├── api-client.ts           # Frontend API client communicating with Express backend
 │   └── supabase/client.ts      # Supabase client initialization
 │
