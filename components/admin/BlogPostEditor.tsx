@@ -212,11 +212,10 @@ export function BlogPostEditor({ initialPosts }: { initialPosts: BlogPost[] }) {
         {posts.map((post) => (
           <div
             key={post.slug}
-            className={`flex items-start justify-between gap-4 rounded-xl border p-4 sm:p-5 transition-colors ${
-              editingPost?.slug === post.slug
+            className={`flex items-start justify-between gap-4 rounded-xl border p-4 sm:p-5 transition-colors ${editingPost?.slug === post.slug
                 ? "border-signal/50 bg-surface shadow-[0_5px_20px_-10px_rgba(67,224,198,0.2)]"
                 : "border-line bg-surface"
-            }`}
+              }`}
           >
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
@@ -226,11 +225,10 @@ export function BlogPostEditor({ initialPosts }: { initialPosts: BlogPost[] }) {
                   </span>
                 )}
                 <span
-                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                    post.published !== false
+                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${post.published !== false
                       ? "border border-line text-muted"
                       : "border border-danger/30 bg-danger/10 text-danger"
-                  }`}
+                    }`}
                 >
                   {post.published !== false ? "Published" : "Draft"}
                 </span>

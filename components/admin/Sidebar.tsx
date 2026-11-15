@@ -9,7 +9,7 @@ const links = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/pricing", label: "Pricing" },
   { href: "/admin/blog", label: "Blog" },
-  { href: "/admin/generator", label: "AI Writer ✨" },
+  { href: "/admin/generator", label: "AI Writer" },
 ];
 
 export function Sidebar() {
@@ -29,9 +29,8 @@ export function Sidebar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`shrink-0 rounded-md px-3 py-1.5 text-sm font-medium ${
-                  active ? "bg-signal/15 text-signal" : "text-muted"
-                }`}
+                className={`shrink-0 rounded-md px-3 py-1.5 text-sm font-medium ${active ? "bg-signal/15 text-signal" : "text-muted"
+                  }`}
               >
                 {link.label}
               </Link>
@@ -76,11 +75,10 @@ function SidebarContent({ pathname }: { pathname: string }) {
             <Link
               key={link.href}
               href={link.href}
-              className={`rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-                active
+              className={`rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${active
                   ? "bg-signal/15 text-signal"
                   : "text-muted hover:bg-ink hover:text-text"
-              }`}
+                }`}
             >
               {link.label}
             </Link>

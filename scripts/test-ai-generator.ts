@@ -17,40 +17,40 @@ async function runTests() {
     topic: string;
     platform?: "all" | "linkedin" | "twitter" | "instagram";
   }[] = [
-    {
-      type: "social_media_caption",
-      tone: "professional",
-      topic: "Announcing real-time sprint bottleneck analytics",
-      platform: "all",
-    },
-    {
-      type: "social_media_caption",
-      tone: "witty",
-      topic: "Why measuring story points is like predicting the weather with a coin toss",
-      platform: "twitter",
-    },
-    {
-      type: "social_media_caption",
-      tone: "inspirational",
-      topic: "Building sustainable engineering culture without weekend crunch",
-      platform: "linkedin",
-    },
-    {
-      type: "blog_post",
-      tone: "educational",
-      topic: "The 2026 Guide to DORA Metrics and Cycle Time Optimization",
-    },
-    {
-      type: "blog_post",
-      tone: "persuasive",
-      topic: "Why High-Growth Startups Switch to Flowmetrics for Capacity Planning",
-    },
-    {
-      type: "text_summary",
-      tone: "casual",
-      topic: "Quarterly engineering review: 40% reduction in lead time",
-    },
-  ];
+      {
+        type: "social_media_caption",
+        tone: "professional",
+        topic: "Announcing real-time sprint bottleneck analytics",
+        platform: "all",
+      },
+      {
+        type: "social_media_caption",
+        tone: "witty",
+        topic: "Why measuring story points is like predicting the weather with a coin toss",
+        platform: "twitter",
+      },
+      {
+        type: "social_media_caption",
+        tone: "inspirational",
+        topic: "Building sustainable engineering culture without weekend crunch",
+        platform: "linkedin",
+      },
+      {
+        type: "blog_post",
+        tone: "educational",
+        topic: "The 2026 Guide to DORA Metrics and Cycle Time Optimization",
+      },
+      {
+        type: "blog_post",
+        tone: "persuasive",
+        topic: "Why High-Growth Startups Switch to Flowmetrics for Capacity Planning",
+      },
+      {
+        type: "text_summary",
+        tone: "casual",
+        topic: "Quarterly engineering review: 40% reduction in lead time",
+      },
+    ];
 
   let passed = 0;
 
@@ -125,10 +125,10 @@ async function runTests() {
   console.log(`   ✓ Refinement Passed!\n`);
   passed++;
 
-  console.log(`🎉 All ${passed}/${passed} tests completed successfully!`);
+  console.log(` All ${passed}/${passed} tests completed successfully!`);
 }
 
 runTests().catch((err) => {
-  console.error("❌ Test failed:", err);
+  console.error(" Test failed:", err);
   process.exit(1);
 });
