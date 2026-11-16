@@ -6,10 +6,20 @@ export function ThemeToggle() {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
-    const initialTheme = savedTheme || "dark";
-    setTheme(initialTheme);
-    document.documentElement.setAttribute("data-theme", initialTheme);
+    const applySaved = () => {
+      const savedTheme = (localStorage.getItem("theme") as "dark" | "light") || "dark";
+      setTheme(savedTheme);
+      document.documentElement.setAttribute("data-theme", savedTheme);
+    };
+
+    applySaved();
+    window.addEventListener("theme-change", applySaved);
+    window.addEventListener("storage", applySaved);
+
+    return () => {
+      window.removeEventListener("theme-change", applySaved);
+      window.removeEventListener("storage", applySaved);
+    };
   }, []);
 
   const toggleTheme = () => {
@@ -17,6 +27,7 @@ export function ThemeToggle() {
     setTheme(nextTheme);
     localStorage.setItem("theme", nextTheme);
     document.documentElement.setAttribute("data-theme", nextTheme);
+    window.dispatchEvent(new Event("theme-change"));
   };
 
   return (

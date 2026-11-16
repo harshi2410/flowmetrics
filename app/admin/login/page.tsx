@@ -19,22 +19,41 @@ export default function AdminLoginPage() {
     setError(null);
 
     try {
-      // 1. Attempt Supabase Auth Sign In
-      let accessToken = "flowmetrics-admin-session-token";
+      // 1. Authenticate against Backend API for cryptographic JWT
+      let accessToken = "";
       try {
-        const { data, error: authError } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password: password.trim(),
+        const authRes = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email.trim(), password: password.trim() }),
         });
-        if (data?.session?.access_token) {
-          accessToken = data.session.access_token;
+        if (authRes.ok) {
+          const authData = await authRes.json();
+          if (authData.data?.token) {
+            accessToken = authData.data.token;
+          }
         }
       } catch {
-        // use local fallback
+        // Fallback to Supabase
       }
 
-      // Save token to localStorage for authenticated Express API requests
-      if (typeof window !== "undefined") {
+      // If backend login wasn't direct, check Supabase
+      if (!accessToken) {
+        try {
+          const { data } = await supabase.auth.signInWithPassword({
+            email: email.trim(),
+            password: password.trim(),
+          });
+          if (data?.session?.access_token) {
+            accessToken = data.session.access_token;
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      // Save verified token to localStorage for authenticated API requests
+      if (typeof window !== "undefined" && accessToken) {
         localStorage.setItem("flowmetrics_admin_token", accessToken);
         localStorage.setItem("flowmetrics_admin_email", email.trim());
       }

@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
+    "dev:turbo": "next dev",
     "build:backend": "npm --prefix backend run build",
     "build:frontend": "next build --webpack",
     "build": "npm run build:backend && next build",

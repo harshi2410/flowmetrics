@@ -106,7 +106,7 @@ export function BlogPostEditor({ initialPosts }: { initialPosts: BlogPost[] }) {
     };
 
     try {
-      const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_admin_token") || "flowmetrics-admin-session-token" : "";
+      const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_admin_token") || "" : "";
       if (editingPost) {
         await fetch(`${apiUrl}/api/admin/blog/${editingPost.slug}`, {
           method: "PUT",
@@ -178,7 +178,7 @@ export function BlogPostEditor({ initialPosts }: { initialPosts: BlogPost[] }) {
 
     const apiUrl = getApiBaseUrl();
     try {
-      const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_admin_token") || "flowmetrics-admin-session-token" : "";
+      const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_admin_token") || "" : "";
       await fetch(`${apiUrl}/api/admin/blog/${postSlug}`, {
         method: "DELETE",
         headers: {

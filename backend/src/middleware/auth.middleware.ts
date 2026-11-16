@@ -1,16 +1,27 @@
 import { Request, Response, NextFunction } from "express";
 import { createClient, User } from "@supabase/supabase-js";
-import dotenv from "dotenv";
+import { env } from "../config/env.js";
+import { verifyJwt, TokenPayload } from "../utils/jwt.js";
+import { sendError } from "../utils/response.js";
 
-dotenv.config();
+const supabase =
+  env.SUPABASE_URL && env.SUPABASE_ANON_KEY
+    ? createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
+    : null;
 
-const supabaseUrl = process.env.SUPABASE_URL || "https://flowmetrics-demo.supabase.co";
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || "demo-supabase-anon-key-flowmetrics-2026";
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export interface AuthenticatedUser {
+  id: string;
+  email: string;
+  role: string;
+  name?: string;
+  orgId?: string;
+  permissions?: string[];
+  user_metadata?: { role?: string; name?: string };
+  app_metadata?: { role?: string };
+}
 
 export interface AuthenticatedRequest extends Request {
-  user?: User | { id: string; email?: string; user_metadata?: { role?: string }; app_metadata?: { role?: string } };
+  user?: AuthenticatedUser;
 }
 
 export async function authMiddleware(
@@ -18,53 +29,79 @@ export async function authMiddleware(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const rawHeader = req.headers.authorization || (req.headers as Record<string, string | string[] | undefined>)["authorization"];
+  const rawHeader =
+    req.headers.authorization ||
+    (req.headers as Record<string, string | string[] | undefined>)["authorization"];
   const authHeader = Array.isArray(rawHeader) ? rawHeader[0] : rawHeader;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res.status(401).json({
-      error: "Unauthorized",
-      message: "Missing or malformed Authorization header. Expected Bearer <token>",
-    });
+    sendError(
+      res,
+      "Unauthorized",
+      "Missing or malformed Authorization header. Expected: Bearer <token>",
+      401
+    );
     return;
   }
 
-  const token = authHeader.split(" ")[1];
-
-  // Support local development / demo admin session token
-  if (
-    token === "demo-admin-session-token" ||
-    token === "flowmetrics-admin-session-token" ||
-    token === "flowmetrics2026"
-  ) {
-    req.user = {
-      id: "admin-demo-uuid",
-      email: "admin@flowmetrics.io",
-      user_metadata: { role: "admin" },
-      app_metadata: { role: "admin" },
-    };
-    next();
+  const token = authHeader.split(" ")[1]?.trim();
+  if (!token) {
+    sendError(res, "Unauthorized", "Empty authentication token provided", 401);
     return;
   }
 
+  // 1. Verify standard Flowmetrics cryptographic JWT
   try {
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-
-    if (error || !user) {
-      res.status(401).json({
-        error: "Unauthorized",
-        message: "Invalid or expired Supabase access token",
-      });
-      return;
-    }
-
-    req.user = user;
-    next();
-  } catch (err) {
-    console.error("Authentication error:", (err as Error).message);
-    res.status(401).json({
-      error: "Unauthorized",
-      message: "Authentication verification failed",
-    });
+    const payload: TokenPayload = verifyJwt(token, env.JWT_SECRET);
+    req.user = {
+      id: payload.sub,
+      email: payload.email,
+      role: payload.role || "viewer",
+      name: payload.name,
+      orgId: payload.orgId,
+      permissions: payload.permissions || [],
+      user_metadata: { role: payload.role, name: payload.name },
+      app_metadata: { role: payload.role },
+    };
+    return next();
+  } catch {
+    // If local JWT check fails, fall through to check Supabase
   }
+
+  // 2. Verify Supabase JWT if Supabase is active
+  if (supabase) {
+    try {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser(token);
+
+      if (user && !error) {
+        const role =
+          (user.user_metadata?.role as string) ||
+          (user.app_metadata?.role as string) ||
+          "viewer";
+
+        req.user = {
+          id: user.id,
+          email: user.email || "",
+          role,
+          name: (user.user_metadata?.name as string) || user.email || "User",
+          user_metadata: { role },
+          app_metadata: { role },
+        };
+        return next();
+      }
+    } catch {
+      // Supabase verification error
+    }
+  }
+
+  // Reject untrusted, bypassed, or expired tokens
+  sendError(
+    res,
+    "Unauthorized",
+    "Invalid, expired, or untrusted authentication token",
+    401
+  );
 }

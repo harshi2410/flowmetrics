@@ -8,17 +8,22 @@ const globalForPg = globalThis as unknown as {
   __flowmetricsPgPool?: Pool;
 };
 
+const isRemoteDb =
+  process.env.DATABASE_SSL === "true" ||
+  connectionString.includes("neon.tech") ||
+  connectionString.includes("sslmode=require") ||
+  (!connectionString.includes("localhost") &&
+    !connectionString.includes("127.0.0.1") &&
+    !connectionString.includes("sslmode=disable"));
+
 export const pool: Pool =
   globalForPg.__flowmetricsPgPool ??
   new Pool({
     connectionString,
     max: 10,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 5000,
-    ssl:
-      process.env.NODE_ENV === "production" && !connectionString.includes("sslmode=disable")
-        ? { rejectUnauthorized: false }
-        : false,
+    connectionTimeoutMillis: 10000,
+    ssl: isRemoteDb ? { rejectUnauthorized: false } : undefined,
   });
 
 if (process.env.NODE_ENV !== "production") {

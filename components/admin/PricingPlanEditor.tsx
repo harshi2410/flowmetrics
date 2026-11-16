@@ -53,7 +53,7 @@ export function PricingPlanEditor({ plan }: { plan: PricingPlan }) {
     };
 
     try {
-      const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_admin_token") || "flowmetrics-admin-session-token" : "";
+      const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_admin_token") || "" : "";
       await fetch(`${apiUrl}/api/admin/pricing/${plan.id}`, {
         method: "PUT",
         headers: {
