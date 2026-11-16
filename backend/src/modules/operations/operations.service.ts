@@ -70,6 +70,15 @@ export class OperationsService {
   async getWorkload(orgId: string): Promise<MemberWorkload[]> {
     return operationsRepository.getWorkloadMetrics(orgId);
   }
+
+  // Sprints
+  async getSprints(orgId: string, projectId?: string): Promise<any[]> {
+    return operationsRepository.listSprints(orgId, projectId);
+  }
+
+  async createSprint(orgId: string, input: { projectId: string; name: string; goal?: string; startDate: string; endDate: string }): Promise<any> {
+    return operationsRepository.createSprint(orgId, input);
+  }
 }
 
 export const operationsService = new OperationsService();

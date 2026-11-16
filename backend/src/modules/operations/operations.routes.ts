@@ -41,4 +41,12 @@ router.get("/workload", (req, res) => {
   operationsController.getWorkload(req as any, res);
 });
 
+// Sprints
+router.get("/sprints", (req, res) => {
+  operationsController.listSprints(req as any, res);
+});
+router.post("/sprints", requirePermission("projects.update"), (req, res) => {
+  operationsController.createSprint(req as any, res);
+});
+
 export default router;

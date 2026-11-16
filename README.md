@@ -1,12 +1,6 @@
-<<<<<<< HEAD
+
 # Flowmetrics — AI-Powered Enterprise Operations Platform
 deployed link - https://flowmetrics-xf93.onrender.com Email: admin@flowmetrics.io Password: flowmetrics2026
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7+-blue.svg)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-16.3-black.svg)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19.2-cyan.svg)](https://react.dev/)
-[![Express.js](https://img.shields.io/badge/Express-4.21-lightgrey.svg)](https://expressjs.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Raw%20SQL%20(No%20ORM)-blue.svg)](https://www.postgresql.org/)
-[![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-4.0-38bdf8.svg)](https://tailwindcss.com/)
 
 **Flowmetrics** is a production-oriented, AI-powered Enterprise Operations Platform designed to streamline cross-functional engineering workflows, project delivery, team capacity, enterprise support triage, internal knowledge retrieval, and automated agent execution.
 

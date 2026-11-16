@@ -115,6 +115,71 @@ export class SupportController {
       sendError(res, "FetchError", err.message || "Failed to fetch comments", 404);
     }
   }
+
+  // Queues
+  async listQueues(req: TenantRequest, res: Response): Promise<void> {
+    try {
+      if (!req.organizationId) {
+        sendError(res, "Forbidden", "Organization context missing", 403);
+        return;
+      }
+      const queues = await supportService.listQueues(req.organizationId);
+      sendSuccess(res, queues, 200, { message: "Queues fetched successfully" });
+    } catch (err: any) {
+      sendError(res, "FetchError", err.message || "Failed to fetch queues", 500);
+    }
+  }
+
+  async createQueue(req: TenantRequest, res: Response): Promise<void> {
+    try {
+      if (!req.organizationId) {
+        sendError(res, "Forbidden", "Organization context missing", 403);
+        return;
+      }
+      const { name, description, teamId } = req.body;
+      if (!name) {
+        sendError(res, "ValidationError", "Queue name is required", 400);
+        return;
+      }
+      const queue = await supportService.createQueue(req.organizationId, { name, description, teamId });
+      sendSuccess(res, queue, 201, { message: "Queue created successfully" });
+    } catch (err: any) {
+      sendError(res, "CreateError", err.message || "Failed to create queue", 500);
+    }
+  }
+
+  // SLA
+  async listSlaPolicies(req: TenantRequest, res: Response): Promise<void> {
+    try {
+      if (!req.organizationId) {
+        sendError(res, "Forbidden", "Organization context missing", 403);
+        return;
+      }
+      const policies = await supportService.listSlaPolicies(req.organizationId);
+      sendSuccess(res, policies, 200, { message: "SLA policies fetched" });
+    } catch (err: any) {
+      sendError(res, "FetchError", err.message || "Failed to fetch SLA policies", 500);
+    }
+  }
+
+  async updateSlaPolicy(req: TenantRequest, res: Response): Promise<void> {
+    try {
+      if (!req.organizationId) {
+        sendError(res, "Forbidden", "Organization context missing", 403);
+        return;
+      }
+      const { id } = req.params;
+      const { responseTimeHours, resolutionTimeHours, businessHoursOnly } = req.body;
+      const updated = await supportService.updateSlaPolicy(req.organizationId, id, {
+        responseTimeHours: Number(responseTimeHours),
+        resolutionTimeHours: Number(resolutionTimeHours),
+        businessHoursOnly,
+      });
+      sendSuccess(res, updated, 200, { message: "SLA policy updated" });
+    } catch (err: any) {
+      sendError(res, "UpdateError", err.message || "Failed to update SLA policy", 400);
+    }
+  }
 }
 
 export const supportController = new SupportController();

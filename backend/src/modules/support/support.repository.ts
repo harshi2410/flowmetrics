@@ -364,6 +364,57 @@ export class SupportRepository {
 
     return memComments.get(ticketId) || [];
   }
+
+  async listQueues(orgId: string): Promise<any[]> {
+    try {
+      const sql = `
+        SELECT q.id, q.name, q.description, q.team_id, q.created_at,
+               t.name as team_name,
+               COUNT(st.id) as ticket_count
+        FROM support_queues q
+        LEFT JOIN teams t ON t.id = q.team_id
+        LEFT JOIN support_tickets st ON st.queue_id = q.id AND st.status NOT IN ('resolved', 'closed')
+        WHERE q.organization_id = $1
+        GROUP BY q.id, q.name, q.description, q.team_id, q.created_at, t.name
+        ORDER BY q.name ASC
+      `;
+      const res = await query(sql, [orgId]);
+      return res.rows;
+    } catch {
+      return [];
+    }
+  }
+
+  async createQueue(orgId: string, input: { name: string; description?: string; teamId?: string }): Promise<any> {
+    const sql = `
+      INSERT INTO support_queues (organization_id, name, description, team_id)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *
+    `;
+    const res = await query(sql, [orgId, input.name, input.description || null, input.teamId || null]);
+    return res.rows[0];
+  }
+
+  async listSlaPolicies(orgId: string): Promise<SlaPolicyRow[]> {
+    try {
+      const sql = `SELECT * FROM sla_policies WHERE organization_id = $1 ORDER BY response_time_hours ASC`;
+      const res = await query<SlaPolicyRow>(sql, [orgId]);
+      return res.rows;
+    } catch {
+      return [];
+    }
+  }
+
+  async updateSlaPolicy(orgId: string, policyId: string, input: { responseTimeHours: number; resolutionTimeHours: number; businessHoursOnly?: boolean }): Promise<any> {
+    const sql = `
+      UPDATE sla_policies
+      SET response_time_hours = $1, resolution_time_hours = $2, business_hours_only = COALESCE($3, business_hours_only)
+      WHERE id = $4 AND organization_id = $5
+      RETURNING *
+    `;
+    const res = await query(sql, [input.responseTimeHours, input.resolutionTimeHours, input.businessHoursOnly, policyId, orgId]);
+    return res.rows[0];
+  }
 }
 
 export const supportRepository = new SupportRepository();

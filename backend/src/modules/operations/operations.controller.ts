@@ -143,6 +143,48 @@ export class OperationsController {
       sendError(res, "WorkloadError", err.message || "Failed to get workload metrics", 500);
     }
   }
+
+  // Sprints
+  async listSprints(req: TenantRequest, res: Response): Promise<void> {
+    try {
+      if (!req.organizationId) {
+        sendError(res, "Forbidden", "Organization context missing", 403);
+        return;
+      }
+      const { projectId } = req.query;
+      const sprints = await operationsService.getSprints(
+        req.organizationId,
+        projectId ? String(projectId) : undefined
+      );
+      sendSuccess(res, sprints, 200, { message: "Sprints fetched successfully" });
+    } catch (err: any) {
+      sendError(res, "FetchError", err.message || "Failed to fetch sprints", 500);
+    }
+  }
+
+  async createSprint(req: TenantRequest, res: Response): Promise<void> {
+    try {
+      if (!req.organizationId) {
+        sendError(res, "Forbidden", "Organization context missing", 403);
+        return;
+      }
+      const { projectId, name, goal, startDate, endDate } = req.body;
+      if (!projectId || !name || !startDate || !endDate) {
+        sendError(res, "ValidationError", "Missing required sprint fields", 400);
+        return;
+      }
+      const sprint = await operationsService.createSprint(req.organizationId, {
+        projectId,
+        name,
+        goal,
+        startDate,
+        endDate,
+      });
+      sendSuccess(res, sprint, 201, { message: "Sprint created successfully" });
+    } catch (err: any) {
+      sendError(res, "CreateError", err.message || "Failed to create sprint", 500);
+    }
+  }
 }
 
 export const operationsController = new OperationsController();

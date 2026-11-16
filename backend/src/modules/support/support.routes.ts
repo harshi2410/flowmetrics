@@ -29,4 +29,20 @@ router.post("/tickets/:id/comments", (req, res) => {
   supportController.addComment(req as any, res);
 });
 
+// Queues
+router.get("/queues", (req, res) => {
+  supportController.listQueues(req as any, res);
+});
+router.post("/queues", requirePermission("tickets.manage"), (req, res) => {
+  supportController.createQueue(req as any, res);
+});
+
+// SLA Policies
+router.get("/sla", (req, res) => {
+  supportController.listSlaPolicies(req as any, res);
+});
+router.put("/sla/:id", requirePermission("tickets.manage"), (req, res) => {
+  supportController.updateSlaPolicy(req as any, res);
+});
+
 export default router;

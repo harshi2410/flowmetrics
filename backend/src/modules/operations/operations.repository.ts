@@ -559,6 +559,45 @@ export class OperationsRepository {
       },
     ];
   }
+
+  async listSprints(organizationId: string, projectId?: string): Promise<any[]> {
+    try {
+      let sql = `
+        SELECT s.id, s.project_id, s.name, s.goal, s.start_date, s.end_date, s.status, s.created_at,
+               p.name AS project_name, p.key AS project_key,
+               COUNT(t.id) as task_count,
+               COUNT(CASE WHEN t.status = 'done' THEN 1 END) as completed_task_count
+        FROM sprints s
+        JOIN projects p ON p.id = s.project_id
+        LEFT JOIN tasks t ON t.sprint_id = s.id
+        WHERE p.organization_id = $1
+      `;
+      const params: any[] = [organizationId];
+      if (projectId) {
+        sql += ` AND s.project_id = $2`;
+        params.push(projectId);
+      }
+      sql += ` GROUP BY s.id, s.project_id, s.name, s.goal, s.start_date, s.end_date, s.status, s.created_at, p.name, p.key ORDER BY s.start_date DESC`;
+      const res = await query(sql, params);
+      return res.rows;
+    } catch {
+      return [];
+    }
+  }
+
+  async createSprint(organizationId: string, input: { projectId: string; name: string; goal?: string; startDate: string; endDate: string }): Promise<any> {
+    try {
+      const sql = `
+        INSERT INTO sprints (project_id, name, goal, start_date, end_date, status)
+        VALUES ($1, $2, $3, $4, $5, 'planned')
+        RETURNING *
+      `;
+      const res = await query(sql, [input.projectId, input.name, input.goal || null, input.startDate, input.endDate]);
+      return res.rows[0];
+    } catch (err) {
+      throw err;
+    }
+  }
 }
 
 export const operationsRepository = new OperationsRepository();

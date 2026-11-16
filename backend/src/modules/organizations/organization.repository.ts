@@ -652,6 +652,34 @@ export class OrganizationRepository {
     }
     return false;
   }
+
+  async listRoles(): Promise<any[]> {
+    try {
+      const sql = `
+        SELECT r.id, r.name, r.description, r.is_system,
+               COALESCE(json_agg(p.name) FILTER (WHERE p.name IS NOT NULL), '[]'::json) AS permissions
+        FROM roles r
+        LEFT JOIN role_permissions rp ON rp.role_id = r.id
+        LEFT JOIN permissions p ON p.id = rp.permission_id
+        GROUP BY r.id, r.name, r.description, r.is_system
+        ORDER BY r.name ASC
+      `;
+      const res = await query(sql);
+      if (res.rowCount > 0) return res.rows;
+    } catch {
+      // fallback
+    }
+
+    return [
+      { id: "owner", name: "Owner", description: "Full workspace ownership and billing control", permissions: ["*"] },
+      { id: "admin", name: "Organization Admin", description: "Administrative management and security control", permissions: ["*"] },
+      { id: "operations_manager", name: "Operations Manager", description: "Projects, sprints, tasks, and team workload balancing", permissions: ["projects.manage", "tasks.manage", "sprints.manage"] },
+      { id: "support_manager", name: "Support Manager", description: "Ticket queues, SLA management, and agent escalation review", permissions: ["tickets.manage", "agents.approve"] },
+      { id: "support_agent", name: "Support Agent", description: "Customer ticket triage and knowledge base search", permissions: ["tickets.read", "tickets.reply", "knowledge.read"] },
+      { id: "team_member", name: "Team Member", description: "Sprint task execution and status updates", permissions: ["tasks.read", "tasks.update"] },
+      { id: "viewer", name: "Viewer", description: "Read-only workspace visibility", permissions: ["*.read"] },
+    ];
+  }
 }
 
 export const organizationRepository = new OrganizationRepository();

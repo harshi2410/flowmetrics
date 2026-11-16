@@ -107,40 +107,54 @@ interface NavSection {
 
 const navSections: NavSection[] = [
   {
-    items: [{ href: "/admin", label: "Dashboard", icon: "grid" }],
+    items: [{ href: "/admin", label: "Overview", icon: "grid" }],
   },
   {
-    title: "Operations",
+    title: "Work Management",
     items: [
-      { href: "/admin/tasks", label: "Tasks and board", icon: "list" },
-      { href: "/admin/workload", label: "Workload balance", icon: "users" },
+      { href: "/admin/projects", label: "Projects", icon: "grid" },
+      { href: "/admin/tasks", label: "Tasks", icon: "list" },
+      { href: "/admin/sprints", label: "Sprints", icon: "flow" },
+      { href: "/admin/workload", label: "Workload", icon: "users" },
+      { href: "/admin/teams", label: "Teams", icon: "users" },
     ],
   },
   {
-    title: "Support",
+    title: "Support Operations",
     items: [
-      { href: "/admin/support", label: "Support ops", icon: "tick" },
-      { href: "/admin/knowledge", label: "Knowledge base", icon: "book" },
+      { href: "/admin/support", label: "Tickets", icon: "tick" },
+      { href: "/admin/support/queues", label: "Queues", icon: "list" },
+      { href: "/admin/support/sla", label: "SLA", icon: "shield" },
+      { href: "/admin/knowledge", label: "Knowledge Base", icon: "book" },
     ],
   },
   {
-    title: "AI",
+    title: "AI Platform",
     items: [
-      { href: "/admin/agents", label: "Agents and approvals", icon: "bot" },
-      { href: "/admin/workflows", label: "Workflows", icon: "flow" },
+      { href: "/admin/agents", label: "Agents", icon: "bot" },
+      { href: "/admin/agent-runs", label: "Agent Runs", icon: "chart" },
+      { href: "/admin/approvals", label: "Approvals", icon: "tick" },
+      { href: "/admin/evaluations", label: "Evaluations", icon: "sparkle" },
       { href: "/admin/observability", label: "Observability", icon: "chart" },
+      { href: "/admin/workflows", label: "Workflows", icon: "flow" },
     ],
   },
   {
-    title: "Admin",
+    title: "Administration",
     items: [
-      { href: "/admin/settings", label: "Settings & Appearance", icon: "shield" },
+      { href: "/admin/members", label: "Members", icon: "users" },
+      { href: "/admin/roles", label: "Roles", icon: "shield" },
+      { href: "/admin/audit", label: "Audit Logs", icon: "shield" },
+      { href: "/admin/settings", label: "Settings", icon: "shield" },
       { href: "/admin/organization", label: "Organization", icon: "shield" },
-      { href: "/admin/members", label: "Members & Access", icon: "users" },
-      { href: "/admin/audit", label: "Audit logs", icon: "shield" },
-      { href: "/admin/pricing", label: "Pricing plans", icon: "card" },
+    ],
+  },
+  {
+    title: "Content Management",
+    items: [
       { href: "/admin/blog", label: "Blog", icon: "pen" },
-      { href: "/admin/generator", label: "AI Writer Studio", icon: "sparkle" },
+      { href: "/admin/pricing", label: "Pricing", icon: "card" },
+      { href: "/admin/generator", label: "AI Content Studio", icon: "sparkle" },
     ],
   },
 ];

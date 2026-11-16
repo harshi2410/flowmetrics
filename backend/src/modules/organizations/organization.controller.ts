@@ -1,6 +1,7 @@
-import { Response } from "express";
+import { Request as ExpressRequest, Response } from "express";
 import { TenantRequest } from "../../middleware/tenant.middleware.js";
 import { organizationService } from "./organization.service.js";
+import { organizationRepository } from "./organization.repository.js";
 import { sendSuccess, sendError } from "../../utils/response.js";
 import {
   CreateOrganizationSchema,
@@ -237,6 +238,19 @@ export class OrganizationController {
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : "Failed to remove member";
       sendError(res, "Bad Request", msg, 400);
+    }
+  }
+
+  /**
+   * GET /api/organizations/roles
+   * List system roles and associated permissions.
+   */
+  async listRoles(req: ExpressRequest, res: Response): Promise<void> {
+    try {
+      const roles = await organizationRepository.listRoles();
+      sendSuccess(res, roles, 200, { message: "Roles fetched successfully" });
+    } catch (error) {
+      sendError(res, "Internal Server Error", "Failed to fetch roles", 500);
     }
   }
 }

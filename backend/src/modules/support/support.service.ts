@@ -87,6 +87,22 @@ export class SupportService {
   async getSlaPolicy(orgId: string, priority: string): Promise<SlaPolicyRow | null> {
     return supportRepository.getSlaPolicy(orgId, priority);
   }
+
+  async listSlaPolicies(orgId: string): Promise<SlaPolicyRow[]> {
+    return supportRepository.listSlaPolicies(orgId);
+  }
+
+  async updateSlaPolicy(orgId: string, policyId: string, input: { responseTimeHours: number; resolutionTimeHours: number; businessHoursOnly?: boolean }): Promise<any> {
+    return supportRepository.updateSlaPolicy(orgId, policyId, input);
+  }
+
+  async listQueues(orgId: string): Promise<any[]> {
+    return supportRepository.listQueues(orgId);
+  }
+
+  async createQueue(orgId: string, input: { name: string; description?: string; teamId?: string }): Promise<any> {
+    return supportRepository.createQueue(orgId, input);
+  }
 }
 
 export const supportService = new SupportService();

@@ -16,6 +16,9 @@ organizationRouter.post("/", writeRateLimiter, (req, res) =>
 organizationRouter.get("/", (req, res) =>
   organizationController.listUserOrganizations(req, res)
 );
+organizationRouter.get("/roles", (req, res) =>
+  organizationController.listRoles(req, res)
+);
 
 // Accept invitation token (global token action)
 organizationRouter.post("/invitations/:token/accept", writeRateLimiter, (req, res) =>
