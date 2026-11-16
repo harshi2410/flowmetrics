@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Flowmetrics — AI-Powered Enterprise Operations Platform
 deployed link - https://flowmetrics-xf93.onrender.com Email: admin@flowmetrics.io Password: flowmetrics2026
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7+-blue.svg)](https://www.typescriptlang.org/)
@@ -517,5 +518,7 @@ Flowmetrics includes a pre-configured `render.yaml` blueprint for one-click depl
 ---
 
 ## 📄 License
+=======
+>>>>>>> 3501619bb465f7ddd0d538a2a0b4b7389ff5a7a7
 
 This project is licensed under the [MIT License](LICENSE).
