@@ -142,6 +142,11 @@ export async function ensureDbInitialized() {
   if (dbInitializedPromise) return dbInitializedPromise;
 
   dbInitializedPromise = (async () => {
+    // Skip database auto-initialization during static build phase
+    if (process.env.NEXT_PHASE === "phase-production-build") {
+      return;
+    }
+
     try {
       const check = await query(
         "SELECT to_regclass('public.admin_users') as table_exists"
@@ -150,8 +155,11 @@ export async function ensureDbInitialized() {
         await initializeDatabase();
         await seedDatabase();
       }
-    } catch (err) {
-      console.warn("Auto-initialization check:", err);
+    } catch (err: unknown) {
+      const msg = (err as Error)?.message || String(err);
+      if (process.env.DEBUG_SQL === "true") {
+        console.warn("Database initialization notice (using offline fallback):", msg);
+      }
     }
   })();
 
