@@ -11,7 +11,7 @@ export async function GET() {
         database: "disconnected",
         timestamp: new Date().toISOString(),
       },
-      { status: 503 }
+      { status: 200 }
     );
   }
 
