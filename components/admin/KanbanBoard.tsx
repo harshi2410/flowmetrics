@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getAdminHeaders, getAdminAuthToken } from "@/lib/auth-client";
 
 export interface Task {
   id: string;
@@ -37,22 +38,16 @@ export function KanbanBoard() {
   const [newTaskPriority, setNewTaskPriority] = useState<Task["priority"]>("medium");
   const [newTaskHours, setNewTaskHours] = useState(4);
 
-  const getHeaders = () => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_token") || "" : "";
-    const currentOrg = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_current_org") : null;
-    const orgId = currentOrg ? JSON.parse(currentOrg).id : "flowmetrics-hq-id";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      "X-Organization-Id": orgId,
-    };
-  };
-
   const loadTasks = async () => {
+    const token = getAdminAuthToken();
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/operations/tasks", { credentials: "include", headers: getHeaders() });
+      const res = await fetch("/api/operations/tasks", { credentials: "include", headers: getAdminHeaders() });
       if (!res.ok) {
         setError("Failed to fetch live tasks from server.");
         setTasks([]);
@@ -78,7 +73,7 @@ export function KanbanBoard() {
     try {
       await fetch(`/api/operations/tasks/${taskId}`, {
         method: "PUT",
-        headers: getHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify({ status: newStatus }),
       });
     } catch {
@@ -94,7 +89,7 @@ export function KanbanBoard() {
     try {
       const res = await fetch("/api/operations/tasks", {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify({
           projectId: "proj-flow-core",
           title: newTaskTitle,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getAdminHeaders, getAdminAuthToken } from "@/lib/auth-client";
 
 interface ApprovalItem {
   id: string;
@@ -32,23 +33,17 @@ export function AgentOpsDashboard() {
   const [description, setDescription] = useState("");
   const [lastExecution, setLastExecution] = useState<any>(null);
 
-  const getHeaders = () => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_token") || "" : "";
-    const currentOrg = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_current_org") : null;
-    const orgId = currentOrg ? JSON.parse(currentOrg).id : "flowmetrics-hq-id";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      "X-Organization-Id": orgId,
-    };
-  };
-
   const loadData = async () => {
+    const token = getAdminAuthToken();
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const [appRes, toolsRes] = await Promise.all([
-        fetch("/api/agents/approvals", { headers: getHeaders() }),
-        fetch("/api/agents/tools", { headers: getHeaders() }),
+        fetch("/api/agents/approvals", { headers: getAdminHeaders() }),
+        fetch("/api/agents/tools", { headers: getAdminHeaders() }),
       ]);
 
       if (appRes.ok) {
@@ -78,7 +73,7 @@ export function AgentOpsDashboard() {
     try {
       const res = await fetch("/api/agents/execute", {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify({
           agentType,
           input: { subject, description },
@@ -104,7 +99,7 @@ export function AgentOpsDashboard() {
     try {
       await fetch(`/api/agents/approvals/${approvalId}/review`, {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify({
           action,
           comment: `Operator clicked ${action} from control deck.`,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getAdminHeaders, getAdminAuthToken } from "@/lib/auth-client";
 
 interface ExecutionItem {
   id: string;
@@ -46,23 +47,17 @@ export function ObservabilityViewer() {
   const [loading, setLoading] = useState(true);
   const [runningEval, setRunningEval] = useState(false);
 
-  const getHeaders = () => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_token") || "" : "";
-    const currentOrg = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_current_org") : null;
-    const orgId = currentOrg ? JSON.parse(currentOrg).id : "flowmetrics-hq-id";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      "X-Organization-Id": orgId,
-    };
-  };
-
   const loadData = async () => {
+    const token = getAdminAuthToken();
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const [execRes, evalRes] = await Promise.all([
-        fetch("/api/agents/executions", { headers: getHeaders() }),
-        fetch("/api/agents/evaluations", { headers: getHeaders() }),
+        fetch("/api/agents/executions", { headers: getAdminHeaders() }),
+        fetch("/api/agents/evaluations", { headers: getAdminHeaders() }),
       ]);
 
       if (execRes.ok) {
@@ -86,7 +81,7 @@ export function ObservabilityViewer() {
   const loadTrace = async (id: string) => {
     setSelectedExecId(id);
     try {
-      const res = await fetch(`/api/agents/executions/${id}/trace`, { headers: getHeaders() });
+      const res = await fetch(`/api/agents/executions/${id}/trace`, { headers: getAdminHeaders() });
       if (res.ok) {
         const json = await res.json();
         setTraceSteps(json.data?.steps || []);
@@ -107,7 +102,7 @@ export function ObservabilityViewer() {
     try {
       const res = await fetch("/api/agents/evaluations/run", {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify({ suiteName: "Enterprise Benchmark Suite" }),
       });
       if (res.ok) {

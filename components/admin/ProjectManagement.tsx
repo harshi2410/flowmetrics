@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { getAdminHeaders, getAdminAuthToken } from "@/lib/auth-client";
 
 interface ProjectItem {
   id: string;
@@ -29,21 +30,15 @@ export function ProjectManagement() {
   const [targetDate, setTargetDate] = useState("");
   const [creating, setCreating] = useState(false);
 
-  const getHeaders = () => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_token") || "" : "";
-    const currentOrg = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_current_org") : null;
-    const orgId = currentOrg ? JSON.parse(currentOrg).id : "flowmetrics-hq-id";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      "X-Organization-Id": orgId,
-    };
-  };
-
   const loadProjects = async () => {
+    const token = getAdminAuthToken();
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const res = await fetch("/api/operations/projects", { headers: getHeaders() });
+      const res = await fetch("/api/operations/projects", { headers: getAdminHeaders() });
       if (res.ok) {
         const json = await res.json();
         setProjects(json.data || []);
@@ -67,7 +62,7 @@ export function ProjectManagement() {
     try {
       const res = await fetch("/api/operations/projects", {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify({
           name: name.trim(),
           key: key.trim().toUpperCase(),

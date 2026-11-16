@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getAdminHeaders, getAdminAuthToken } from "@/lib/auth-client";
 
 interface SprintItem {
   id: string;
@@ -29,23 +30,17 @@ export function SprintManagement() {
   const [endDate, setEndDate] = useState("");
   const [creating, setCreating] = useState(false);
 
-  const getHeaders = () => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_token") || "" : "";
-    const currentOrg = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_current_org") : null;
-    const orgId = currentOrg ? JSON.parse(currentOrg).id : "flowmetrics-hq-id";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      "X-Organization-Id": orgId,
-    };
-  };
-
   const loadData = async () => {
+    const token = getAdminAuthToken();
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const [sprintsRes, projRes] = await Promise.all([
-        fetch("/api/operations/sprints", { headers: getHeaders() }),
-        fetch("/api/operations/projects", { headers: getHeaders() }),
+        fetch("/api/operations/sprints", { headers: getAdminHeaders() }),
+        fetch("/api/operations/projects", { headers: getAdminHeaders() }),
       ]);
       if (sprintsRes.ok) {
         const json = await sprintsRes.json();
@@ -77,7 +72,7 @@ export function SprintManagement() {
     try {
       const res = await fetch("/api/operations/sprints", {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify({
           projectId,
           name: name.trim(),

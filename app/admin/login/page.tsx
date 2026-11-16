@@ -55,6 +55,7 @@ export default function AdminLoginPage() {
       // Save verified token to localStorage for authenticated API requests
       if (typeof window !== "undefined" && accessToken) {
         localStorage.setItem("flowmetrics_admin_token", accessToken);
+        localStorage.setItem("flowmetrics_token", accessToken);
         localStorage.setItem("flowmetrics_admin_email", email.trim());
       }
 

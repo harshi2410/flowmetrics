@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getAdminHeaders, getAdminAuthToken } from "@/lib/auth-client";
 
 export interface SupportTicket {
   id: string;
@@ -48,21 +49,15 @@ export function SupportTicketsTable() {
   const [newEmail, setNewEmail] = useState("");
   const [newPriority, setNewPriority] = useState<SupportTicket["priority"]>("medium");
 
-  const getHeaders = () => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_token") || "" : "";
-    const currentOrg = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_current_org") : null;
-    const orgId = currentOrg ? JSON.parse(currentOrg).id : "flowmetrics-hq-id";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      "X-Organization-Id": orgId,
-    };
-  };
-
   const loadTickets = async () => {
+    const token = getAdminAuthToken();
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const res = await fetch("/api/support/tickets", { headers: getHeaders() });
+      const res = await fetch("/api/support/tickets", { headers: getAdminHeaders() });
       if (res.ok) {
         const data = await res.json();
         setTickets(data.data || []);
@@ -81,7 +76,7 @@ export function SupportTicketsTable() {
   const openTicketDetail = async (ticket: SupportTicket) => {
     setSelectedTicket(ticket);
     try {
-      const res = await fetch(`/api/support/tickets/${ticket.id}/comments`, { headers: getHeaders() });
+      const res = await fetch(`/api/support/tickets/${ticket.id}/comments`, { headers: getAdminHeaders() });
       if (res.ok) {
         const data = await res.json();
         setComments(data.data || []);
@@ -108,7 +103,7 @@ export function SupportTicketsTable() {
     try {
       const res = await fetch(`/api/support/tickets/${selectedTicket.id}/comments`, {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify({
           authorName: "Support Operator",
           content: newComment,
@@ -140,7 +135,7 @@ export function SupportTicketsTable() {
     try {
       const res = await fetch("/api/support/tickets", {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify({
           subject: newSubject,
           description: newDescription,

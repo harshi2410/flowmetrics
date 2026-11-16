@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getAdminHeaders, getAdminAuthToken } from "@/lib/auth-client";
 
 interface EvalItem {
   id: string;
@@ -19,21 +20,15 @@ export function EvaluationsDeck() {
   const [running, setRunning] = useState(false);
   const [suiteName, setSuiteName] = useState("Enterprise Benchmark Suite");
 
-  const getHeaders = () => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_token") || "" : "";
-    const currentOrg = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_current_org") : null;
-    const orgId = currentOrg ? JSON.parse(currentOrg).id : "flowmetrics-hq-id";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      "X-Organization-Id": orgId,
-    };
-  };
-
   const loadEvals = async () => {
+    const token = getAdminAuthToken();
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const res = await fetch("/api/agents/evaluations", { headers: getHeaders() });
+      const res = await fetch("/api/agents/evaluations", { headers: getAdminHeaders() });
       if (res.ok) {
         const json = await res.json();
         setEvals(json.data || []);
@@ -54,7 +49,7 @@ export function EvaluationsDeck() {
     try {
       const res = await fetch("/api/agents/evaluations/run", {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify({ suiteName }),
       });
       if (res.ok) {

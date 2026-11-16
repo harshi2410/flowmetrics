@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getAdminHeaders, getAdminAuthToken } from "@/lib/auth-client";
 
 interface WorkflowRule {
   id: string;
@@ -27,21 +28,15 @@ export function WorkflowAutomationManager() {
   const [simulating, setSimulating] = useState(false);
   const [simulationResult, setSimulationResult] = useState<any>(null);
 
-  const getHeaders = () => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_token") || "" : "";
-    const currentOrg = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_current_org") : null;
-    const orgId = currentOrg ? JSON.parse(currentOrg).id : "flowmetrics-hq-id";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      "X-Organization-Id": orgId,
-    };
-  };
-
   const loadRules = async () => {
+    const token = getAdminAuthToken();
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const res = await fetch("/api/workflows/rules", { headers: getHeaders() });
+      const res = await fetch("/api/workflows/rules", { headers: getAdminHeaders() });
       if (res.ok) {
         const json = await res.json();
         setRules(json.data || []);
@@ -73,7 +68,7 @@ export function WorkflowAutomationManager() {
     try {
       const res = await fetch("/api/workflows/rules", {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify(payload),
       });
       if (res.ok) {
@@ -106,7 +101,7 @@ export function WorkflowAutomationManager() {
     try {
       const res = await fetch("/api/workflows/trigger", {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify({
           event: "ticket.created",
           payload: { priority: "critical", subject: "Simulated load test incident" },

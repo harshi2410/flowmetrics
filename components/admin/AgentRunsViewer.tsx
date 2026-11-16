@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getAdminHeaders, getAdminAuthToken } from "@/lib/auth-client";
 
 interface ExecutionItem {
   id: string;
@@ -19,21 +20,15 @@ export function AgentRunsViewer() {
   const [toolCalls, setToolCalls] = useState<any[]>([]);
   const [loadingTrace, setLoadingTrace] = useState(false);
 
-  const getHeaders = () => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_token") || "" : "";
-    const currentOrg = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_current_org") : null;
-    const orgId = currentOrg ? JSON.parse(currentOrg).id : "flowmetrics-hq-id";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      "X-Organization-Id": orgId,
-    };
-  };
-
   const loadRuns = async () => {
+    const token = getAdminAuthToken();
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const res = await fetch("/api/agents/executions", { headers: getHeaders() });
+      const res = await fetch("/api/agents/executions", { headers: getAdminHeaders() });
       if (res.ok) {
         const json = await res.json();
         setRuns(json.data || []);
@@ -53,7 +48,7 @@ export function AgentRunsViewer() {
     setSelectedRun(run);
     setLoadingTrace(true);
     try {
-      const res = await fetch(`/api/agents/executions/${run.id}/trace`, { headers: getHeaders() });
+      const res = await fetch(`/api/agents/executions/${run.id}/trace`, { headers: getAdminHeaders() });
       if (res.ok) {
         const json = await res.json();
         setTraceSteps(json.data?.steps || []);

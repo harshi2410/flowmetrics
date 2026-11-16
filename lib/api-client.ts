@@ -29,7 +29,9 @@ export async function getAuthToken(): Promise<string | null> {
   }
 
   if (typeof window !== "undefined") {
-    const localToken = localStorage.getItem("flowmetrics_admin_token");
+    const localToken =
+      localStorage.getItem("flowmetrics_token") ||
+      localStorage.getItem("flowmetrics_admin_token");
     if (localToken) return localToken;
   }
 

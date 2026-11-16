@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getAdminHeaders, getAdminAuthToken } from "@/lib/auth-client";
 
 interface KnowledgeDoc {
   id: string;
@@ -30,21 +31,15 @@ export function KnowledgeBaseManager() {
   const [sourceType, setSourceType] = useState("runbook");
   const [content, setContent] = useState("");
 
-  const getHeaders = () => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_token") || "" : "";
-    const currentOrg = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_current_org") : null;
-    const orgId = currentOrg ? JSON.parse(currentOrg).id : "flowmetrics-hq-id";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      "X-Organization-Id": orgId,
-    };
-  };
-
   const loadDocuments = async () => {
+    const token = getAdminAuthToken();
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const res = await fetch("/api/knowledge/documents", { headers: getHeaders() });
+      const res = await fetch("/api/knowledge/documents", { headers: getAdminHeaders() });
       if (res.ok) {
         const data = await res.json();
         setDocs(data.data || []);
@@ -68,7 +63,7 @@ export function KnowledgeBaseManager() {
     try {
       const res = await fetch("/api/knowledge/query", {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify({ query: searchQuery, limit: 4 }),
       });
       if (res.ok) {
@@ -99,7 +94,7 @@ export function KnowledgeBaseManager() {
     try {
       const res = await fetch("/api/knowledge/documents", {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify({ title, sourceType, content }),
       });
       if (res.ok) {

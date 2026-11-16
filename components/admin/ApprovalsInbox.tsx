@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getAdminHeaders, getAdminAuthToken } from "@/lib/auth-client";
 
 interface ApprovalItem {
   id: string;
@@ -18,21 +19,15 @@ export function ApprovalsInbox() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "pending" | "resolved">("pending");
 
-  const getHeaders = () => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_token") || "" : "";
-    const currentOrg = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_current_org") : null;
-    const orgId = currentOrg ? JSON.parse(currentOrg).id : "flowmetrics-hq-id";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      "X-Organization-Id": orgId,
-    };
-  };
-
   const loadApprovals = async () => {
+    const token = getAdminAuthToken();
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const res = await fetch("/api/agents/approvals", { headers: getHeaders() });
+      const res = await fetch("/api/agents/approvals", { headers: getAdminHeaders() });
       if (res.ok) {
         const json = await res.json();
         setApprovals(json.data || []);
@@ -52,7 +47,7 @@ export function ApprovalsInbox() {
     try {
       const res = await fetch(`/api/agents/approvals/${id}/review`, {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify({
           action,
           comment: `Operator reviewed and marked as ${action} from Approvals Inbox.`,

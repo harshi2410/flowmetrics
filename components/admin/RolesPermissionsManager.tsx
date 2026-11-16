@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getAdminHeaders, getAdminAuthToken } from "@/lib/auth-client";
 
 interface RoleItem {
   id: string;
@@ -15,18 +16,15 @@ export function RolesPermissionsManager() {
   const [loading, setLoading] = useState(true);
   const [selectedRole, setSelectedRole] = useState<RoleItem | null>(null);
 
-  const getHeaders = () => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_token") || "" : "";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    };
-  };
-
   const loadRoles = async () => {
+    const token = getAdminAuthToken();
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const res = await fetch("/api/organizations/roles", { headers: getHeaders() });
+      const res = await fetch("/api/organizations/roles", { headers: getAdminHeaders() });
       if (res.ok) {
         const json = await res.json();
         setRoles(json.data || []);

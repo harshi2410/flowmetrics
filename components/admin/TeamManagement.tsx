@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getAdminHeaders, getAdminAuthToken } from "@/lib/auth-client";
 
 interface TeamItem {
   id: string;
@@ -19,21 +20,15 @@ export function TeamManagement() {
   const [description, setDescription] = useState("");
   const [creating, setCreating] = useState(false);
 
-  const getHeaders = () => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_token") || "" : "";
-    const currentOrg = typeof window !== "undefined" ? localStorage.getItem("flowmetrics_current_org") : null;
-    const orgId = currentOrg ? JSON.parse(currentOrg).id : "flowmetrics-hq-id";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      "X-Organization-Id": orgId,
-    };
-  };
-
   const loadTeams = async () => {
+    const token = getAdminAuthToken();
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const res = await fetch("/api/operations/teams", { headers: getHeaders() });
+      const res = await fetch("/api/operations/teams", { headers: getAdminHeaders() });
       if (res.ok) {
         const json = await res.json();
         setTeams(json.data || []);
@@ -57,7 +52,7 @@ export function TeamManagement() {
     try {
       const res = await fetch("/api/operations/teams", {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify({
           name: name.trim(),
           description: description.trim() || undefined,
